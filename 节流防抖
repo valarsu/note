@@ -1,0 +1,44 @@
+```js
+var reduceFrequencyUtil = {
+  debounceTo: {},
+  throttleTo: {},
+  throttleLast: {},
+  // 防抖
+  debounce(option, cb) {
+    if (!option.time) { option.time = 200 }
+    if (!this.debounceTo[option.queues]) {
+      this.debounceTo[option.queues] = null
+    }
+    clearTimeout(this.debounceTo[option.queues])
+    this.debounceTo[option.queues] = setTimeout(() => {
+      cb && cb()
+      clearTimeout(this.debounceTo[option.queues])
+      if (option.queues in this.debounceTo) { delete this.debounceTo[option.queues] }
+    }, option.time)
+  },
+
+  // 节流
+  throttle(option, cb) {
+    if (!option.time) { option.time = 1000 }
+    let now = +new Date()
+
+    if (!this.throttleTo[option.queues]) { this.throttleTo[option.queues] = null }
+    if (!this.throttleLast[option.queues]) { this.throttleLast[option.queues] = null }
+
+    if (this.throttleLast[option.queues] && now < this.throttleLast[option.queues] + option.time) {
+      clearTimeout(this.throttleTo[option.queues])
+      this.throttleTo[option.queues] = setTimeout(() => {
+        cb && cb()
+        clearTimeout(this.throttleTo[option.queues])
+        if (option.queues in this.throttleTo) { delete this.throttleTo[option.queues] }
+      }, option.time)
+    } else {
+      this.throttleLast[option.queues] = now
+      cb && cb()
+    }
+  }
+}
+
+module.exports = reduceFrequencyUtil
+
+```
